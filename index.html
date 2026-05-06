@@ -314,6 +314,191 @@
   .month-pill:hover { border-color: var(--green-accent); color: var(--green-accent); }
   .month-pill.active { background: var(--green-accent); border-color: var(--green-accent); color: #fff; }
   .month-pill.all { border-style: dashed; }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — TABLET & MOBILE
+   ═══════════════════════════════════════════ */
+
+/* ── BOTTOM NAV (mobile only, hidden on desktop) ── */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 64px;
+  background: var(--sidebar-bg);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  z-index: 200;
+  padding: 0 4px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav-inner {
+  display: flex;
+  height: 64px;
+  align-items: center;
+  justify-content: space-around;
+}
+.bnav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--sidebar-text);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 10px;
+  transition: all 0.18s;
+  min-width: 0;
+}
+.bnav-item svg { width: 20px; height: 20px; opacity: 0.7; }
+.bnav-item.active { color: var(--green-accent); }
+.bnav-item.active svg { opacity: 1; }
+.bnav-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
+
+/* ── MOBILE TOPBAR ── */
+.mobile-topbar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  z-index: 150;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.mobile-topbar .mob-logo { display: flex; align-items: center; gap: 10px; }
+.mobile-topbar .mob-logo-icon { width: 32px; height: 32px; background: var(--green-accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.mobile-topbar h3 { color: #fff; font-size: 14px; font-weight: 700; }
+.mobile-topbar p { color: var(--sidebar-text); font-size: 10px; }
+.mob-status { display: flex; align-items: center; gap: 6px; }
+.mob-admin-badge { background: var(--green-accent); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+
+/* ── TABLET: 768px – 1024px ── */
+@media (max-width: 1024px) {
+  .sidebar { width: 200px; }
+  .main { margin-left: 200px; padding: 28px 24px 36px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid { grid-template-columns: 1fr; }
+  .hero-logo-img { height: 52px; }
+  .dashboard-hero { padding: 20px 24px; }
+}
+
+/* ── MOBILE: ≤ 767px ── */
+@media (max-width: 767px) {
+  /* Hide desktop sidebar, show mobile nav */
+  .sidebar { display: none !important; }
+  .mobile-topbar { display: flex; }
+  .bottom-nav { display: block; }
+
+  /* Main content — shift for topbar + bottom nav */
+  .main {
+    margin-left: 0 !important;
+    padding: 72px 14px 80px;
+  }
+
+  /* Stats: 2 kolom di mobile */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-card { padding: 16px 14px; }
+  .stat-value { font-size: 17px; }
+  .stat-label { font-size: 10px; }
+  .stat-sub { font-size: 11px; }
+  .stat-icon { width: 30px; height: 30px; font-size: 14px; top: 12px; right: 12px; }
+
+  /* Dashboard hero — stack vertikal */
+  .dashboard-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 18px;
+    gap: 12px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .hero-logo-img { height: 44px; }
+  .hero-right { align-items: flex-start; }
+
+  /* Filter pills — scrollable horizontal */
+  .dash-filter-bar {
+    padding: 10px 12px;
+    gap: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .dash-filter-bar::-webkit-scrollbar { display: none; }
+  #month-pills { flex-wrap: nowrap; gap: 6px; }
+  .month-pill { font-size: 11px; padding: 6px 12px; white-space: nowrap; }
+  .dash-filter-label { white-space: nowrap; flex-shrink: 0; }
+
+  /* Dashboard grid — single column */
+  .dash-grid { grid-template-columns: 1fr; gap: 14px; }
+  .card { padding: 16px 14px; border-radius: 12px; }
+  .card-title { font-size: 13px; margin-bottom: 14px; }
+
+  /* Belum bayar chips — 1 kolom */
+  .belum-bayar-list { grid-template-columns: 1fr; gap: 8px; }
+  .belum-bayar-section { padding: 16px 14px; border-radius: 12px; }
+
+  /* Page header */
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+  .page-header h1 { font-size: 20px; }
+
+  /* Search bar full width */
+  .filter-row { flex-direction: column; gap: 10px; }
+  .search-bar { width: 100%; max-width: 100%; box-sizing: border-box; }
+  .search-wrap { width: 100%; }
+  .search-wrap input { width: 100%; }
+
+  /* Month filter select full width */
+  .month-filter-wrap { width: 100%; }
+  .month-select { width: 100%; }
+
+  /* Tabs */
+  .tab-bar { gap: 6px; }
+  .tab-btn { font-size: 12px; padding: 8px 14px; }
+
+  /* Table — horizontal scroll */
+  .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+  table { min-width: 520px; }
+  thead th { padding: 11px 12px; font-size: 10px; }
+  tbody td { padding: 11px 12px; font-size: 12px; }
+
+  /* Modals full width */
+  .modal { width: 95vw; padding: 24px 18px; border-radius: 16px; }
+  .admin-lock-box { width: 92vw; padding: 28px 20px; border-radius: 16px; }
+
+  /* Activity list */
+  .activity-item { gap: 10px; padding: 9px 0; }
+  .activity-icon { width: 30px; height: 30px; font-size: 13px; }
+  .activity-info strong { font-size: 12px; }
+  .activity-amount { font-size: 12px; }
+  .activity-date { font-size: 10px; }
+
+  /* Confirm box */
+  .confirm-box { width: 92vw; padding: 24px 18px; }
+
+  /* Button primary — full width di mobile */
+  .page-header .btn-primary { width: 100%; justify-content: center; }
+}
+
+/* ── SMALL MOBILE: ≤ 380px ── */
+@media (max-width: 380px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-value { font-size: 15px; }
+  .main { padding: 68px 10px 76px; }
+  .month-pill { font-size: 10px; padding: 5px 10px; }
+}
+
 </style>
 </head>
 <body>
@@ -746,6 +931,9 @@ function toastErr(msg) { toast(msg, true); }
 function setDbStatus(state, label) {
   document.getElementById('db-dot').className = 'db-dot ' + state;
   document.getElementById('db-label').textContent = label;
+  // Sync mobile indicator dot
+  const mobDot = document.getElementById('mob-db-dot');
+  if (mobDot) mobDot.style.background = state==='ok'?'#4caf50':state==='err'?'#e53935':'#f9a825';
 }
 function setLoadingText(t) { document.getElementById('loading-text').textContent = t; }
 
@@ -773,6 +961,13 @@ function showPage(name) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   document.querySelectorAll('.nav-item')[['dashboard','warga','pembayaran','pengeluaran'].indexOf(name)].classList.add('active');
+  // Sync bottom nav (mobile)
+  ['dashboard','warga','pembayaran','pengeluaran'].forEach(p => {
+    const el = document.getElementById('bnav-' + p);
+    if (el) el.className = 'bnav-item' + (p === name ? ' active' : '');
+  });
+  // Scroll to top on mobile
+  window.scrollTo(0, 0);
   if (name === 'dashboard')   renderDashboard();
   if (name === 'warga')       renderWarga();
   if (name === 'pembayaran')  { populateBulanFilter(); renderPembayaran(); }
@@ -1305,8 +1500,12 @@ function logoutAdmin() {
 }
 
 function updateAdminBadge() {
+  const isAdmin = isAdminLoggedIn();
   const badge = document.getElementById('admin-mode-badge');
-  if (badge) badge.style.display = isAdminLoggedIn() ? 'flex' : 'none';
+  if (badge) badge.style.display = isAdmin ? 'flex' : 'none';
+  // Mobile badge
+  const mobBadge = document.getElementById('mob-admin-badge');
+  if (mobBadge) mobBadge.style.display = isAdmin ? 'inline-block' : 'none';
 }
 
 // Panggil ini sebelum melakukan aksi admin
@@ -1389,6 +1588,44 @@ init();
     </div>
   </div>
 </div>
+
+
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar" id="mobile-topbar">
+  <div class="mob-logo">
+    <div class="mob-logo-icon">🏠</div>
+    <div>
+      <h3>IPL Manager</h3>
+      <p>D'Grand Fahira 2</p>
+    </div>
+  </div>
+  <div class="mob-status">
+    <span class="mob-admin-badge" id="mob-admin-badge" style="display:none">🔓 Admin</span>
+    <div class="db-dot" id="mob-db-dot" style="width:8px;height:8px;border-radius:50%;background:#4caf50;margin-left:6px"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAVIGATION (mobile) -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" id="bnav-dashboard" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="bnav-item" id="bnav-warga" onclick="showPage('warga')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Warga</span>
+    </button>
+    <button class="bnav-item" id="bnav-pembayaran" onclick="showPage('pembayaran')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span>Bayar</span>
+    </button>
+    <button class="bnav-item" id="bnav-pengeluaran" onclick="showPage('pengeluaran')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Keluar</span>
+    </button>
+  </div>
+</nav>
 
 </body>
 </html>
