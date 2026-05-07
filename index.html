@@ -499,6 +499,59 @@
   .month-pill { font-size: 10px; padding: 5px 10px; }
 }
 
+
+  /* ── PEMASUKAN TYPE TOGGLE ── */
+  .toggle-type-bar { display: flex; gap: 8px; }
+  .toggle-type-btn {
+    flex: 1; padding: 9px 14px; border-radius: 9px;
+    border: 1.5px solid var(--border); background: none;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: inherit; color: var(--text-secondary);
+    transition: all 0.18s;
+  }
+  .toggle-type-btn:hover { border-color: var(--green-accent); color: var(--green-accent); }
+  .toggle-type-btn.active { background: var(--green-accent); border-color: var(--green-accent); color: #fff; }
+
+  /* ── DASHBOARD DROPDOWN FILTER ── */
+  .dash-filter-dropdown {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 16px;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .dash-filter-dropdown label {
+    font-size: 12px; font-weight: 700;
+    color: var(--text-secondary); text-transform: uppercase;
+    letter-spacing: 0.06em; white-space: nowrap;
+  }
+  .dash-month-select {
+    padding: 8px 36px 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px; font-size: 13px; font-weight: 600;
+    background: var(--bg); color: var(--text-primary);
+    font-family: inherit; outline: none; cursor: pointer;
+    transition: border 0.15s;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b8a6b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    min-width: 160px;
+  }
+  .dash-month-select:focus { border-color: var(--green-accent); }
+  .filter-summary {
+    font-size: 12px; color: var(--text-secondary);
+    margin-left: auto;
+  }
+  .filter-summary strong { color: var(--green-primary); }
+
+  /* Kategori badge pemasukan lain */
+  .badge.sewa { background: #e8eaf6; color: #3949ab; }
+  .badge.donasi { background: #fce4ec; color: #c2185b; }
+  .badge.sosial { background: #f3e5f5; color: #7b1fa2; }
+  .badge.subsidi { background: #e0f7fa; color: #00838f; }
+  .badge.iuran { background: var(--green-light); color: var(--green-primary); }
+
 </style>
 </head>
 <body>
@@ -568,10 +621,13 @@
       </div>
     </div>
 
-    <!-- Month Filter Pills -->
-    <div class="dash-filter-bar">
-      <span class="dash-filter-label">📅 Filter Bulan:</span>
-      <div id="month-pills" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+    <!-- Month Filter Dropdown -->
+    <div class="dash-filter-dropdown">
+      <label>📅 Filter Bulan</label>
+      <select class="dash-month-select" id="dash-month-select" onchange="setDashFilter(this.value)">
+        <option value="">Semua Bulan</option>
+      </select>
+      <span class="filter-summary" id="filter-summary"></span>
     </div>
 
     <div class="stats-grid" id="stats-grid"></div>
@@ -693,17 +749,42 @@
 
 <div class="modal-overlay" id="modal-pembayaran">
   <div class="modal">
-    <h3>Catat Pembayaran</h3>
-    <div class="form-group"><label>Warga</label><select class="form-control" id="p-warga"></select></div>
-    <div class="form-group"><label>Bulan Pembayaran</label><input class="form-control" id="p-bulan" type="month"/></div>
+    <h3>Catat Pemasukan</h3>
+    <!-- Toggle tipe: Iuran Warga vs Pemasukan Lain -->
+    <div class="form-group">
+      <label>Jenis Pemasukan</label>
+      <div class="toggle-type-bar">
+        <button class="toggle-type-btn active" id="ptype-iuran" onclick="setPemasukanType('iuran')">👤 Iuran Warga</button>
+        <button class="toggle-type-btn" id="ptype-lain" onclick="setPemasukanType('lain')">💰 Pemasukan Lain</button>
+      </div>
+    </div>
+    <!-- Panel: Iuran Warga -->
+    <div id="panel-iuran">
+      <div class="form-group"><label>Warga</label><select class="form-control" id="p-warga" onchange="autoFillIuran()"></select></div>
+      <div class="form-group"><label>Bulan</label><input class="form-control" id="p-bulan" type="month"/></div>
+    </div>
+    <!-- Panel: Pemasukan Lain -->
+    <div id="panel-lain" style="display:none">
+      <div class="form-group"><label>Judul / Keterangan</label><input class="form-control" id="p-judul" type="text" placeholder="Contoh: Sewa Lapangan, Donasi Warga, dll"/></div>
+      <div class="form-group"><label>Kategori</label>
+        <select class="form-control" id="p-kategori">
+          <option>Sewa Fasilitas</option>
+          <option>Donasi</option>
+          <option>Dana Sosial</option>
+          <option>Subsidi RT/RW</option>
+          <option>Lainnya</option>
+        </select>
+      </div>
+    </div>
+    <!-- Shared fields -->
     <div class="form-group"><label>Jumlah (Rp)</label><input class="form-control" id="p-jumlah" type="number" placeholder="250000"/></div>
-    <div class="form-group"><label>Tanggal Bayar</label><input class="form-control" id="p-tgl" type="date"/></div>
-    <div class="form-group"><label>Metode Pembayaran</label>
+    <div class="form-group"><label>Tanggal</label><input class="form-control" id="p-tgl" type="date"/></div>
+    <div class="form-group"><label>Metode</label>
       <select class="form-control" id="p-metode"><option>Transfer</option><option>Tunai</option><option>QRIS</option></select>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('pembayaran')">Batal</button>
-      <button class="btn-submit" id="btn-save-pembayaran" onclick="savePembayaran()">Simpan</button>
+      <button class="btn-submit" id="btn-save-pembayaran" onclick="savePembayaran()">💾 Simpan</button>
     </div>
   </div>
 </div>
@@ -836,7 +917,7 @@ function normBulan(raw) {
 
 // Parse baris dari Sheets ke objek
 function rowToWarga(r)       { return { id: +r[0], nama: r[1]+'', blok: r[2]+'', telp: r[3]+'', iuran: +r[4], status: r[5]+'' }; }
-function rowToPembayaran(r)  { return { id: +r[0], wargaId: +r[1], bulan: normBulan(r[2]), jumlah: +r[3], tgl: normDate(r[4]), metode: r[5]+'' }; }
+function rowToPembayaran(r)  { return { id: +r[0], wargaId: r[1]?+r[1]:null, judul: r[6]+'', kategori: r[7]||'Iuran Warga', bulan: normBulan(r[2]), jumlah: +r[3], tgl: normDate(r[4]), metode: r[5]+'' }; }
 function rowToPengeluaran(r) { return { id: +r[0], judul: r[1]+'', kategori: r[2]+'', jumlah: +r[3], tgl: normDate(r[4]) }; }
 
 // GET data dari satu sheet
@@ -996,11 +1077,27 @@ function openModal(type) {
 function closeModal(type) { document.getElementById('modal-' + type).classList.remove('open'); }
 
 function populateWargaSelect() {
+  // Reset ke mode iuran warga
+  pemasukanType = 'iuran';
+  const btnIuran = document.getElementById('ptype-iuran');
+  const btnLain  = document.getElementById('ptype-lain');
+  if (btnIuran) btnIuran.className = 'toggle-type-btn active';
+  if (btnLain)  btnLain.className  = 'toggle-type-btn';
+  const panelIuran = document.getElementById('panel-iuran');
+  const panelLain  = document.getElementById('panel-lain');
+  if (panelIuran) panelIuran.style.display = '';
+  if (panelLain)  panelLain.style.display  = 'none';
+  // Populate warga dropdown
   const sel = document.getElementById('p-warga');
   sel.innerHTML = wargaData.filter(w => w.status === 'Aktif').map(w => `<option value="${w.id}">${w.nama} (${w.blok})</option>`).join('');
   document.getElementById('p-tgl').value = new Date().toISOString().slice(0,10);
+  const jdl = document.getElementById('p-judul');
+  if (jdl) jdl.value = '';
   const now = new Date();
   document.getElementById('p-bulan').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  // Auto-fill jumlah dari warga pertama
+  const firstW = wargaData.find(w => w.status === 'Aktif');
+  document.getElementById('p-jumlah').value = firstW ? firstW.iuran : '';
 }
 
 // ════════════════════════════════════════
@@ -1043,23 +1140,76 @@ function editWarga(id) {
   document.getElementById('modal-warga').classList.add('open');
 }
 
-async function savePembayaran() {
+let pemasukanType = 'iuran'; // 'iuran' | 'lain'
+
+function setPemasukanType(type) {
+  pemasukanType = type;
+  document.getElementById('ptype-iuran').className = 'toggle-type-btn' + (type==='iuran'?' active':'');
+  document.getElementById('ptype-lain').className  = 'toggle-type-btn' + (type==='lain'?' active':'');
+  document.getElementById('panel-iuran').style.display = type==='iuran' ? '' : 'none';
+  document.getElementById('panel-lain').style.display  = type==='lain'  ? '' : 'none';
+  // Auto-fill jumlah jika ganti ke iuran
+  if (type === 'iuran') {
+    const wId = parseInt(document.getElementById('p-warga').value);
+    const w = wargaData.find(x => x.id === wId);
+    if (w) document.getElementById('p-jumlah').value = w.iuran;
+    document.getElementById('p-jumlah').placeholder = 'Sesuai iuran warga';
+  } else {
+    document.getElementById('p-jumlah').value = '';
+    document.getElementById('p-jumlah').placeholder = 'Nominal pemasukan';
+  }
+}
+
+
+function autoFillIuran() {
+  if (pemasukanType !== 'iuran') return;
   const wId = parseInt(document.getElementById('p-warga').value);
-  const w   = wargaData.find(x => x.id === wId);
-  const obj = {
-    id: nextId.pembayaran++,
-    wargaId: wId,
-    bulan:   document.getElementById('p-bulan').value,
-    jumlah:  parseInt(document.getElementById('p-jumlah').value) || (w ? w.iuran : 0),
-    tgl:     document.getElementById('p-tgl').value,
-    metode:  document.getElementById('p-metode').value,
-  };
+  const w = wargaData.find(x => x.id === wId);
+  if (w) document.getElementById('p-jumlah').value = w.iuran;
+}
+async function savePembayaran() {
+  const jumlah = parseInt(document.getElementById('p-jumlah').value) || 0;
+  const tgl    = document.getElementById('p-tgl').value;
+  if (!jumlah) { alert('Jumlah wajib diisi!'); return; }
+  if (!tgl)    { alert('Tanggal wajib diisi!'); return; }
+
+  let obj;
+  if (pemasukanType === 'iuran') {
+    const wId = parseInt(document.getElementById('p-warga').value);
+    const w   = wargaData.find(x => x.id === wId);
+    const bulan = document.getElementById('p-bulan').value;
+    if (!bulan) { alert('Bulan pembayaran wajib diisi!'); return; }
+    obj = {
+      id: nextId.pembayaran++,
+      wargaId:  wId,
+      judul:    w ? w.nama : 'Iuran Warga',
+      kategori: 'Iuran Warga',
+      bulan,
+      jumlah,
+      tgl,
+      metode: document.getElementById('p-metode').value,
+    };
+  } else {
+    const judul = document.getElementById('p-judul').value.trim();
+    if (!judul) { alert('Judul / keterangan wajib diisi!'); return; }
+    obj = {
+      id: nextId.pembayaran++,
+      wargaId:  null,
+      judul,
+      kategori: document.getElementById('p-kategori').value,
+      bulan:    tgl.slice(0, 7), // ambil YYYY-MM dari tanggal
+      jumlah,
+      tgl,
+      metode: document.getElementById('p-metode').value,
+    };
+  }
+
   setBtnLoading('btn-save-pembayaran', true);
   pembayaranData.unshift(obj);
   closeModal('pembayaran');
   renderPembayaran();
   await saveAll();
-  toast('Pembayaran dicatat ✓');
+  toast(pemasukanType==='iuran' ? 'Pembayaran iuran dicatat ✓' : 'Pemasukan lain dicatat ✓');
   setBtnLoading('btn-save-pembayaran', false);
 }
 
@@ -1122,6 +1272,11 @@ async function doDelete() {
 // ════════════════════════════════════════
 function kategBadge(k) {
   const map = {'Listrik & Air':'listrik','Keamanan':'keamanan','Kebersihan':'kebersihan','Perawatan':'perawatan','Taman':'taman'};
+  return `<span class="badge ${map[k]||''}">${k}</span>`;
+}
+
+function kategBadgePemasukan(k) {
+  const map = {'Sewa Fasilitas':'sewa','Donasi':'donasi','Dana Sosial':'sosial','Subsidi RT/RW':'subsidi','Iuran Warga':'iuran'};
   return `<span class="badge ${map[k]||''}">${k}</span>`;
 }
 function metodeBadge(m) {
@@ -1212,9 +1367,13 @@ function renderPembayaran() {
     const tb = document.getElementById('table-pembayaran');
     if (!rows.length) { tb.innerHTML = `<tr><td colspan="7"><div class="empty-state">Tidak ada data pembayaran</div></td></tr>`; return; }
     tb.innerHTML = rows.map(p => {
-      const w = wargaData.find(x => x.id === p.wargaId) || {};
+      const w = p.wargaId ? (wargaData.find(x => x.id === p.wargaId) || {}) : null;
+      const isIuran = !!w;
+      const displayNama = isIuran ? w.nama : (p.judul || 'Pemasukan Lain');
+      const displayBlok = isIuran ? w.blok : kategBadgePemasukan(p.kategori||'Lainnya');
       return `<tr>
-        <td><strong>${w.nama||'-'}</strong></td><td>${w.blok||'-'}</td>
+        <td><strong>${displayNama}</strong></td>
+        <td>${displayBlok}</td>
         <td>${fmtBulan(p.bulan)}</td><td class="amount-positive">${rp(p.jumlah)}</td>
         <td>${fmtDate(p.tgl)}</td><td>${metodeBadge(p.metode)}</td>
         <td><button class="action-btn btn-delete" onclick="requireAdmin(() => confirmDelete('pembayaran',${p.id}))">
@@ -1291,35 +1450,44 @@ function setDashFilter(bulan) {
   renderDashboard();
 }
 
-function renderMonthPills() {
-  const pillsEl = document.getElementById('month-pills');
-  if (!pillsEl) return;
+function renderMonthDropdown() {
+  const sel = document.getElementById('dash-month-select');
+  if (!sel) return;
 
-  // Kumpulkan semua bulan yang ada di data
+  // Kumpulkan bulan dari data, max 24 bulan terakhir
   const bulanSet = new Set([
     ...pembayaranData.map(p => p.bulan),
     ...pengeluaranData.map(p => (p.tgl||'').slice(0,7))
   ].filter(b => b && b.length === 7));
-  const sorted = [...bulanSet].sort((a,b) => b.localeCompare(a));
+  const sorted = [...bulanSet].sort((a,b) => b.localeCompare(a)).slice(0, 24);
 
-  // Kalau belum ada filter aktif, default ke bulan sekarang (kalau ada)
+  // Default ke bulan berjalan jika belum dipilih
   const now = new Date();
   const curMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  if (dashFilterBulan === null && sorted.includes(curMonth)) {
-    dashFilterBulan = curMonth;
-  } else if (dashFilterBulan === null && sorted.length > 0) {
-    dashFilterBulan = sorted[0]; // bulan terbaru
+  if (dashFilterBulan === null) {
+    dashFilterBulan = sorted.includes(curMonth) ? curMonth : (sorted[0] || '');
   }
 
-  pillsEl.innerHTML =
-    `<button class="month-pill all ${dashFilterBulan===''?'active':''}" onclick="setDashFilter('')">Semua</button>` +
-    sorted.map(b =>
-      `<button class="month-pill ${dashFilterBulan===b?'active':''}" onclick="setDashFilter('${b}')">${fmtBulan(b)}</button>`
-    ).join('');
+  const curVal = sel.value || dashFilterBulan;
+  sel.innerHTML = '<option value="">— Semua Bulan —</option>' +
+    sorted.map(b => `<option value="${b}" ${b===curVal?'selected':''}>${fmtBulan(b)}</option>`).join('');
+  if (dashFilterBulan) sel.value = dashFilterBulan;
+
+  // Update summary
+  const summary = document.getElementById('filter-summary');
+  if (summary) {
+    if (!dashFilterBulan) {
+      summary.innerHTML = `Menampilkan <strong>semua data</strong>`;
+    } else {
+      const inCnt = pembayaranData.filter(p => p.bulan === dashFilterBulan).length;
+      const outCnt = pengeluaranData.filter(p => (p.tgl||'').slice(0,7) === dashFilterBulan).length;
+      summary.innerHTML = `<strong>${fmtBulan(dashFilterBulan)}</strong> · ${inCnt} pemasukan, ${outCnt} pengeluaran`;
+    }
+  }
 }
 
 function renderDashboard() {
-  renderMonthPills();
+  renderMonthDropdown();
 
   const isFiltered = dashFilterBulan && dashFilterBulan !== '';
   const aktif = wargaData.filter(w => w.status === 'Aktif').length;
