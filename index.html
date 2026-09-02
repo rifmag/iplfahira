@@ -131,6 +131,38 @@
   .amount-positive { color: var(--green-primary); font-weight: 700; }
   .amount-negative { color: var(--red); font-weight: 700; }
 
+  /* ── LAPORAN ARUS KAS ── */
+  .laporan-toolbar { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+  .laporan-field { display: flex; flex-direction: column; gap: 6px; }
+  .laporan-field label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .laporan-mode-toggle { display: flex; background: #eef4ee; border-radius: 10px; padding: 4px; gap: 4px; }
+  .laporan-mode-toggle button { border: none; background: none; padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-secondary); font-family: inherit; transition: all 0.15s; }
+  .laporan-mode-toggle button.active { background: var(--green-accent); color: #fff; }
+  .laporan-doc { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 40px 48px; max-width: 760px; margin: 0 auto; }
+  .laporan-doc-head { text-align: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 2px solid var(--text-primary); }
+  .laporan-doc-head h2 { font-size: 17px; font-weight: 800; letter-spacing: 0.02em; }
+  .laporan-doc-head h3 { font-size: 14.5px; font-weight: 700; margin-top: 5px; }
+  .laporan-doc-head p { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+  .laporan-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .laporan-table td { padding: 7px 4px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .laporan-table tr.laporan-section td { font-weight: 800; padding-top: 18px; border-bottom: none; }
+  .laporan-table tr.laporan-section:first-child td { padding-top: 0; }
+  .laporan-table tr.laporan-sub td { font-weight: 700; background: #f7faf7; border-top: 1.5px solid var(--text-primary); border-bottom: 1.5px solid var(--text-primary); }
+  .laporan-table tr.laporan-final td { font-weight: 800; font-size: 14px; border-top: 3px double var(--text-primary); border-bottom: 3px double var(--text-primary); }
+  .laporan-table tr.laporan-saldo td { padding-top: 16px; }
+  .laporan-table td.amt { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .laporan-table td.indent1 { padding-left: 16px; }
+  .laporan-table td.indent2 { padding-left: 32px; color: var(--text-secondary); }
+  .laporan-empty-note { text-align: center; color: var(--text-secondary); font-size: 13px; padding: 30px 0 !important; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #laporan-print-area, #laporan-print-area * { visibility: visible; }
+    #laporan-print-area { position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 0; }
+    .laporan-doc { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+    .no-print { display: none !important; }
+  }
+
   /* ── MODAL ── */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
@@ -609,6 +641,50 @@
     cursor:pointer; font-family:inherit; margin-left:6px;
   }
 
+/* ═══════════ PETA RUMAH (STATUS BAYAR) ═══════════ */
+  .peta-head {
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:14px; flex-wrap:wrap; margin-bottom:16px;
+    padding-bottom:14px; border-bottom:1px solid var(--border);
+  }
+  .peta-title { font-size:15px; font-weight:700; color:var(--text-dark); }
+  .peta-sub { font-size:12.5px; color:var(--text-light); margin-top:3px; }
+  .peta-legend { display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--text-light); }
+  .peta-legend span { display:flex; align-items:center; gap:5px; }
+  .lg-box { width:13px; height:13px; border-radius:4px; display:inline-block; }
+  .lg-lunas   { background:#1976d2; }
+  .lg-belum   { background:#e53935; }
+  .lg-nonaktif{ background:#e0e0e0; border:1px solid #bdbdbd; }
+
+  .peta-grid {
+    display:grid; gap:9px;
+    grid-template-columns:repeat(auto-fill, minmax(62px, 1fr));
+  }
+  .peta-box {
+    aspect-ratio:1/1; border-radius:11px; border:2px solid transparent;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; font-family:inherit; padding:2px;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .peta-box:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,.18); }
+  .peta-box .pb-no { font-size:15px; font-weight:800; line-height:1.1; }
+  .peta-box .pb-nama {
+    font-size:8.5px; margin-top:2px; opacity:.85; max-width:100%;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 3px;
+  }
+  .peta-box.lunas   { background:#1976d2; border-color:#1565c0; color:#fff; }
+  .peta-box.belum   { background:#fff; border-color:#e53935; color:#e53935; }
+  .peta-box.belum:hover { background:#e53935; color:#fff; }
+  .peta-box.nonaktif{ background:#f5f5f5; border-color:#e0e0e0; color:#9e9e9e; cursor:default; }
+  .peta-box.nonaktif:hover { transform:none; box-shadow:none; }
+
+  @media (max-width: 640px) {
+    .peta-grid { grid-template-columns:repeat(auto-fill, minmax(52px, 1fr)); gap:7px; }
+    .peta-box .pb-no { font-size:13px; }
+    .peta-box .pb-nama { font-size:7.5px; }
+    .peta-legend { font-size:10.5px; gap:10px; }
+  }
+
 @media (max-width: 380px) {
   .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .stat-value { font-size: 15px; }
@@ -712,7 +788,7 @@
 
     <button class="btn-login" id="btn-login" onclick="doLogin()">Masuk</button>
 
-    <div class="login-foot" style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12)">© 2026 Pengurus — D'Grand Fahira 2</div>
+    <div class="login-foot" style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.12)">© 2026 Pengurus RT — D'Grand Fahira 2</div>
   </div>
 </div>
 
@@ -753,6 +829,10 @@
     <button class="nav-item" onclick="showPage('pengeluaran')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       Pengeluaran
+    </button>
+    <button class="nav-item" onclick="showPage('laporan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+      Laporan Arus Kas
     </button>
   </nav>
   <div class="user-chip" id="user-chip" style="display:none"></div>
@@ -853,6 +933,23 @@
     <div class="tab-bar">
       <button class="tab-btn active" onclick="setPembayaranTab('sudah')" id="tab-sudah">&#9989; Sudah Bayar</button>
       <button class="tab-btn" onclick="setPembayaranTab('belum')" id="tab-belum">&#9888; Belum Bayar</button>
+      <button class="tab-btn" onclick="setPembayaranTab('peta')" id="tab-peta">&#127968; Peta Rumah</button>
+    </div>
+    <div id="panel-peta" style="display:none">
+      <div class="table-card" style="padding:18px">
+        <div class="peta-head">
+          <div>
+            <div class="peta-title">Status Iuran <span id="peta-bulan"></span></div>
+            <div class="peta-sub" id="peta-ringkas"></div>
+          </div>
+          <div class="peta-legend">
+            <span><i class="lg-box lg-lunas"></i> Sudah Bayar</span>
+            <span><i class="lg-box lg-belum"></i> Belum Bayar</span>
+            <span><i class="lg-box lg-nonaktif"></i> Tidak Aktif</span>
+          </div>
+        </div>
+        <div class="peta-grid" id="peta-grid"></div>
+      </div>
     </div>
     <div id="panel-sudah">
       <div class="table-card">
@@ -884,6 +981,50 @@
     <div class="table-card">
       <table><thead><tr><th>Judul</th><th>Kategori</th><th>Jumlah</th><th>Tanggal</th><th></th></tr></thead>
       <tbody id="table-pengeluaran"></tbody></table>
+    </div>
+  </div>
+
+  <!-- LAPORAN ARUS KAS -->
+  <div id="page-laporan" class="page">
+    <div class="page-header no-print">
+      <div><h1>Laporan Arus Kas</h1><p>Ringkasan kas masuk &amp; keluar per periode, siap dicetak ke PDF</p></div>
+      <button class="btn-primary" onclick="cetakLaporanArusKas()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Cetak / Simpan PDF
+      </button>
+    </div>
+
+    <div class="laporan-toolbar no-print">
+      <div class="laporan-field">
+        <label>Mode Periode</label>
+        <div class="laporan-mode-toggle">
+          <button id="lap-mode-bulan" class="active" onclick="setLaporanMode('bulan')">📅 Bulanan</button>
+          <button id="lap-mode-rentang" onclick="setLaporanMode('rentang')">📆 Rentang Bulan</button>
+        </div>
+      </div>
+      <div class="laporan-field" id="lap-field-bulan">
+        <label>Pilih Bulan</label>
+        <select class="month-select" id="lap-bulan-tunggal" onchange="renderLaporanArusKas()"></select>
+      </div>
+      <div class="laporan-field" id="lap-field-dari" style="display:none">
+        <label>Dari Bulan</label>
+        <select class="month-select" id="lap-bulan-dari" onchange="renderLaporanArusKas()"></select>
+      </div>
+      <div class="laporan-field" id="lap-field-sampai" style="display:none">
+        <label>Sampai Bulan</label>
+        <select class="month-select" id="lap-bulan-sampai" onchange="renderLaporanArusKas()"></select>
+      </div>
+    </div>
+
+    <div id="laporan-print-area">
+      <div class="laporan-doc">
+        <div class="laporan-doc-head">
+          <h2>IPL D'GRAND FAHIRA 2</h2>
+          <h3>Laporan Arus Kas (Metode Langsung)</h3>
+          <p id="lap-periode-text">—</p>
+        </div>
+        <table class="laporan-table" id="lap-table"></table>
+      </div>
     </div>
   </div>
 
@@ -1202,9 +1343,9 @@ function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  document.querySelectorAll('.nav-item')[['dashboard','warga','pembayaran','pengeluaran'].indexOf(name)].classList.add('active');
+  document.querySelectorAll('.nav-item')[['dashboard','warga','pembayaran','pengeluaran','laporan'].indexOf(name)].classList.add('active');
   // Sync bottom nav (mobile)
-  ['dashboard','warga','pembayaran','pengeluaran'].forEach(p => {
+  ['dashboard','warga','pembayaran','pengeluaran','laporan'].forEach(p => {
     const el = document.getElementById('bnav-' + p);
     if (el) el.className = 'bnav-item' + (p === name ? ' active' : '');
   });
@@ -1214,6 +1355,7 @@ function showPage(name) {
   if (name === 'warga')       renderWarga();
   if (name === 'pembayaran')  { populateBulanFilter(); renderPembayaran(); }
   if (name === 'pengeluaran') renderPengeluaran();
+  if (name === 'laporan')     { populateLaporanBulanOptions(); renderLaporanArusKas(); }
 }
 
 // ════════════════════════════════════════
@@ -1479,8 +1621,10 @@ function setPembayaranTab(tab) {
   pembayaranTab = tab;
   document.getElementById('tab-sudah').className = 'tab-btn' + (tab==='sudah'?' active':'');
   document.getElementById('tab-belum').className = 'tab-btn' + (tab==='belum'?' active':'');
+  document.getElementById('tab-peta').className  = 'tab-btn' + (tab==='peta' ?' active':'');
   document.getElementById('panel-sudah').style.display = tab==='sudah' ? '' : 'none';
   document.getElementById('panel-belum').style.display  = tab==='belum' ? '' : 'none';
+  document.getElementById('panel-peta').style.display   = tab==='peta'  ? '' : 'none';
   renderPembayaran();
 }
 
@@ -1542,9 +1686,76 @@ function renderPembayaran() {
         </button></td>
       </tr>`;
     }).join('');
+  } else if (pembayaranTab === 'peta') {
+    renderPetaRumah(filterBulan);
   } else {
     renderBelumBayar(filterBulan);
   }
+}
+
+// ══════ PETA RUMAH: kotak status bayar per rumah ══════
+function renderPetaRumah(filterBulan) {
+  const now = new Date();
+  const targetBulan = filterBulan || `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const q = (document.getElementById('search-pembayaran').value||'').toLowerCase();
+
+  const sudahIds = new Set(
+    pembayaranData.filter(p => p.bulan === targetBulan && p.wargaId).map(p => p.wargaId)
+  );
+
+  // Urutkan berdasarkan angka pada blok/nomor rumah (A-01, A-02, ... 10, 11)
+  const angka = s => { const m = (s||'').match(/\d+/); return m ? +m[0] : 9999; };
+  const list = [...wargaData].sort((a,b) =>
+    (a.blok||'').replace(/\d+/g,'').localeCompare((b.blok||'').replace(/\d+/g,'')) ||
+    angka(a.blok) - angka(b.blok)
+  );
+
+  const aktif   = list.filter(w => w.status === 'Aktif');
+  const lunas   = aktif.filter(w => sudahIds.has(w.id)).length;
+  const belum   = aktif.length - lunas;
+  const persen  = aktif.length ? Math.round(lunas / aktif.length * 100) : 0;
+
+  document.getElementById('peta-bulan').textContent = fmtBulan(targetBulan);
+  document.getElementById('peta-ringkas').innerHTML =
+    `<strong style="color:#1976d2">${lunas} lunas</strong> &nbsp;·&nbsp; ` +
+    `<strong style="color:#e53935">${belum} belum</strong> &nbsp;·&nbsp; ` +
+    `dari ${aktif.length} rumah aktif (${persen}%)`;
+
+  const grid = document.getElementById('peta-grid');
+  const tampil = list.filter(w => !q ||
+    (w.nama||'').toLowerCase().includes(q) || (w.blok||'').toLowerCase().includes(q));
+
+  if (!tampil.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">Tidak ada rumah yang cocok</div>`;
+    return;
+  }
+
+  grid.innerHTML = tampil.map(w => {
+    const nonaktif = w.status !== 'Aktif';
+    const isLunas  = sudahIds.has(w.id);
+    const cls      = nonaktif ? 'nonaktif' : (isLunas ? 'lunas' : 'belum');
+    const label    = w.blok || w.nama.substring(0,3);
+    const ket      = nonaktif ? 'Tidak aktif' : (isLunas ? 'SUDAH bayar' : 'BELUM bayar');
+    const title    = `${w.nama} — ${w.blok}\n${ket} · ${fmtBulan(targetBulan)}\nIuran: ${rp(w.iuran)}`;
+    return `<button class="peta-box ${cls}" title="${title.replace(/"/g,'&quot;')}"
+              onclick="klikPetaRumah(${w.id},'${targetBulan}')">
+        <span class="pb-no">${label}</span>
+        <span class="pb-nama">${(w.nama||'').split(' ')[0]}</span>
+      </button>`;
+  }).join('');
+}
+
+function klikPetaRumah(wargaId, targetBulan) {
+  const w = wargaData.find(x => x.id === wargaId);
+  if (!w) return;
+  if (w.status !== 'Aktif') { toast('ℹ️ ' + w.nama + ' berstatus tidak aktif'); return; }
+
+  const bayar = pembayaranData.find(p => p.wargaId === wargaId && p.bulan === targetBulan);
+  if (bayar) {
+    toast(`✅ ${w.nama} (${w.blok}) sudah bayar ${rp(bayar.jumlah)} pada ${fmtDate(bayar.tgl)}`);
+    return;
+  }
+  requireAdmin(() => bayarSekarang(wargaId, targetBulan));
 }
 
 function renderBelumBayar(filterBulan) {
@@ -1601,6 +1812,140 @@ function renderPengeluaran() {
         </button>
       </div></td>
     </tr>`).join('');
+}
+
+// ════════════════════════════════════════
+// LAPORAN ARUS KAS
+// ════════════════════════════════════════
+let laporanMode = 'bulan'; // 'bulan' | 'rentang'
+
+// Mengumpulkan semua bulan (YYYY-MM) yang punya transaksi, urut naik
+function daftarBulanTransaksi() {
+  const set = new Set([
+    ...pembayaranData.map(p => p.bulan).filter(Boolean),
+    ...pengeluaranData.map(p => (p.tgl || '').slice(0, 7)).filter(Boolean)
+  ]);
+  return Array.from(set).sort();
+}
+
+function populateLaporanBulanOptions() {
+  const bulanList = daftarBulanTransaksi();
+  const opts = bulanList.map(b => `<option value="${b}">${fmtBulan(b)}</option>`).join('');
+  const selTunggal = document.getElementById('lap-bulan-tunggal');
+  const selDari    = document.getElementById('lap-bulan-dari');
+  const selSampai  = document.getElementById('lap-bulan-sampai');
+  if (!bulanList.length) {
+    const kosong = '<option value="">Belum ada data</option>';
+    selTunggal.innerHTML = kosong; selDari.innerHTML = kosong; selSampai.innerHTML = kosong;
+    return;
+  }
+  const curTunggal = selTunggal.value;
+  const curDari    = selDari.value;
+  const curSampai  = selSampai.value;
+  selTunggal.innerHTML = opts;
+  selDari.innerHTML    = opts;
+  selSampai.innerHTML  = opts;
+  // Pertahankan pilihan sebelumnya jika masih ada, kalau tidak pakai default masuk akal
+  selTunggal.value = bulanList.includes(curTunggal) ? curTunggal : bulanList[bulanList.length - 1];
+  selDari.value     = bulanList.includes(curDari)    ? curDari    : bulanList[0];
+  selSampai.value    = bulanList.includes(curSampai)  ? curSampai  : bulanList[bulanList.length - 1];
+}
+
+function setLaporanMode(mode) {
+  laporanMode = mode;
+  document.getElementById('lap-mode-bulan').classList.toggle('active', mode === 'bulan');
+  document.getElementById('lap-mode-rentang').classList.toggle('active', mode === 'rentang');
+  document.getElementById('lap-field-bulan').style.display   = mode === 'bulan'   ? 'flex' : 'none';
+  document.getElementById('lap-field-dari').style.display    = mode === 'rentang' ? 'flex' : 'none';
+  document.getElementById('lap-field-sampai').style.display  = mode === 'rentang' ? 'flex' : 'none';
+  renderLaporanArusKas();
+}
+
+function groupByKategori(items) {
+  const map = {};
+  items.forEach(it => { map[it.kategori] = (map[it.kategori] || 0) + it.jumlah; });
+  return Object.entries(map).sort((a, b) => b[1] - a[1]); // terbesar dulu
+}
+
+function renderLaporanArusKas() {
+  const bulanList = daftarBulanTransaksi();
+  const tbl = document.getElementById('lap-table');
+  const periodeText = document.getElementById('lap-periode-text');
+
+  if (!bulanList.length) {
+    periodeText.textContent = 'Belum ada data transaksi';
+    tbl.innerHTML = `<tr><td colspan="2" class="laporan-empty-note">Belum ada data pembayaran atau pengeluaran yang tercatat.</td></tr>`;
+    return;
+  }
+
+  let start, end;
+  if (laporanMode === 'bulan') {
+    start = end = document.getElementById('lap-bulan-tunggal').value;
+  } else {
+    start = document.getElementById('lap-bulan-dari').value;
+    end   = document.getElementById('lap-bulan-sampai').value;
+    if (start > end) { [start, end] = [end, start]; }
+  }
+  if (!start || !end) {
+    periodeText.textContent = 'Belum ada data transaksi';
+    tbl.innerHTML = `<tr><td colspan="2" class="laporan-empty-note">Pilih periode terlebih dahulu.</td></tr>`;
+    return;
+  }
+
+  periodeText.textContent = (start === end)
+    ? 'Untuk Periode ' + fmtBulan(start)
+    : 'Untuk Periode ' + fmtBulan(start) + ' – ' + fmtBulan(end);
+
+  // Transaksi dalam periode
+  const masukPeriode  = pembayaranData.filter(p => p.bulan >= start && p.bulan <= end);
+  const keluarPeriode = pengeluaranData.filter(p => (p.tgl || '').slice(0, 7) >= start && (p.tgl || '').slice(0, 7) <= end);
+
+  const totalMasuk  = masukPeriode.reduce((s, p) => s + p.jumlah, 0);
+  const totalKeluar = keluarPeriode.reduce((s, p) => s + p.jumlah, 0);
+  const kasBersih   = totalMasuk - totalKeluar;
+
+  // Saldo awal = akumulasi seluruh transaksi SEBELUM periode berjalan (kas bersifat kumulatif)
+  const masukSebelum  = pembayaranData.filter(p => p.bulan < start).reduce((s, p) => s + p.jumlah, 0);
+  const keluarSebelum = pengeluaranData.filter(p => (p.tgl || '').slice(0, 7) < start).reduce((s, p) => s + p.jumlah, 0);
+  const saldoAwal  = masukSebelum - keluarSebelum;
+  const saldoAkhir = saldoAwal + kasBersih;
+
+  const kategoriMasuk  = groupByKategori(masukPeriode);
+  const kategoriKeluar = groupByKategori(keluarPeriode);
+
+  let rows = '';
+  rows += `<tr class="laporan-section"><td colspan="2">Aktivitas Operasional</td></tr>`;
+
+  rows += `<tr><td class="indent1">Kas Masuk</td><td></td></tr>`;
+  if (kategoriMasuk.length) {
+    kategoriMasuk.forEach(([kat, jml]) => {
+      rows += `<tr><td class="indent2">${kat}</td><td class="amt">${rp(jml)}</td></tr>`;
+    });
+  } else {
+    rows += `<tr><td class="indent2">Tidak ada kas masuk periode ini</td><td class="amt">${rp(0)}</td></tr>`;
+  }
+  rows += `<tr><td class="indent1" style="font-weight:700">Total Kas Masuk Operasional</td><td class="amt" style="font-weight:700">${rp(totalMasuk)}</td></tr>`;
+
+  rows += `<tr><td class="indent1" style="padding-top:12px">Kas Keluar</td><td></td></tr>`;
+  if (kategoriKeluar.length) {
+    kategoriKeluar.forEach(([kat, jml]) => {
+      rows += `<tr><td class="indent2">${kat}</td><td class="amt">(${rp(jml)})</td></tr>`;
+    });
+  } else {
+    rows += `<tr><td class="indent2">Tidak ada kas keluar periode ini</td><td class="amt">(${rp(0)})</td></tr>`;
+  }
+  rows += `<tr><td class="indent1" style="font-weight:700">Total Kas Keluar Operasional</td><td class="amt" style="font-weight:700">(${rp(totalKeluar)})</td></tr>`;
+
+  rows += `<tr class="laporan-sub"><td>Kas Bersih dari Aktivitas Operasional</td><td class="amt">${rp(kasBersih)}</td></tr>`;
+
+  rows += `<tr class="laporan-saldo"><td>Saldo Kas Awal Periode</td><td class="amt">${rp(saldoAwal)}</td></tr>`;
+  rows += `<tr class="laporan-final"><td>Saldo Kas Akhir Periode</td><td class="amt">${rp(saldoAkhir)}</td></tr>`;
+
+  tbl.innerHTML = rows;
+}
+
+function cetakLaporanArusKas() {
+  window.print();
 }
 
 // Active dashboard filter state
@@ -2091,6 +2436,10 @@ init();
     <button class="bnav-item" id="bnav-pengeluaran" onclick="showPage('pengeluaran')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       <span>Keluar</span>
+    </button>
+    <button class="bnav-item" id="bnav-laporan" onclick="showPage('laporan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+      <span>Laporan</span>
     </button>
   </div>
 </nav>
